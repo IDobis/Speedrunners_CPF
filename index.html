@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aplicação web avaliativa sobre Speedrunners com cadastro, lista, consulta de CEP, LocalStorage e Fetch API.">
+  <title>Speedrunners | Projeto Final</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="cabecalhoAplicacao">
+    <a class="linkMarca" href="#telaCadastro" aria-label="Speedrunners, ir para cadastro">
+      <span class="marcaSigla" aria-hidden="true">SR</span>
+      <span class="textoMarca">Speedrunners</span>
+    </a>
+
+    <nav class="painelNavegacao" aria-label="Painel de navegação">
+      <button class="botaoNavegacao ativo" type="button" data-tela-destino="telaCadastro" aria-controls="telaCadastro" aria-pressed="true">Cadastro</button>
+      <button class="botaoNavegacao" type="button" data-tela-destino="telaLista" aria-controls="telaLista" aria-pressed="false">Lista</button>
+      <button class="botaoNavegacao" type="button" data-tela-destino="telaCep" aria-controls="telaCep" aria-pressed="false">CEP</button>
+      <button class="botaoNavegacao" type="button" data-tela-destino="telaSobre" aria-controls="telaSobre" aria-pressed="false">Sobre</button>
+    </nav>
+
+    <button class="botaoAlternarTema" id="botaoAlternarTema" type="button" aria-pressed="false">
+      Tema escuro
+    </button>
+  </header>
+
+  <main class="conteudoPrincipal">
+    <section class="painelTela ativo" id="telaCadastro" aria-labelledby="tituloCadastro">
+      <div class="introducaoTela">
+        <div>
+          <p class="textoDestaque">Tela 1</p>
+          <h1 id="tituloCadastro">Cadastro de Speedrunners</h1>
+          <p>
+            Registre os jogadores da comunidade, valide os dados em tempo real
+            e mantenha tudo salvo no navegador.
+          </p>
+        </div>
+
+        <img
+          class="imagemDestaque"
+          src="Img/Vitao.jpg"
+          alt="Vitao representando a tela de cadastro de speedrunners"
+          width="320"
+          height="240"
+        >
+      </div>
+
+      <form class="formularioUsuario" id="formularioUsuario" novalidate>
+        <div class="gradeFormulario">
+          <label class="campoFormulario" for="campoNomeUsuario">
+            Nome
+            <input id="campoNomeUsuario" name="nomeUsuario" type="text" autocomplete="name" maxlength="60" required>
+            <span class="mensagemErroCampo" id="erroNomeUsuario" aria-live="polite"></span>
+          </label>
+
+          <label class="campoFormulario" for="campoEmailUsuario">
+            E-mail
+            <input id="campoEmailUsuario" name="emailUsuario" type="email" autocomplete="email" maxlength="80" required>
+            <span class="mensagemErroCampo" id="erroEmailUsuario" aria-live="polite"></span>
+          </label>
+
+          <label class="campoFormulario" for="campoCpfUsuario">
+            CPF
+            <input id="campoCpfUsuario" name="cpfUsuario" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14" required>
+            <span class="mensagemErroCampo" id="erroCpfUsuario" aria-live="polite"></span>
+          </label>
+
+          <label class="campoFormulario" for="campoIdadeUsuario">
+            Idade
+            <input id="campoIdadeUsuario" name="idadeUsuario" type="number" min="6" max="120" step="1" required>
+            <span class="mensagemErroCampo" id="erroIdadeUsuario" aria-live="polite"></span>
+          </label>
+        </div>
+
+        <div class="acoesFormulario">
+          <button class="botaoPrimario" id="botaoSalvarUsuario" type="submit">Salvar speedrunner</button>
+          <button class="botaoSecundario" id="botaoLimparFormularioUsuario" type="reset">Limpar campos</button>
+        </div>
+
+        <p class="retornoFormulario" id="retornoFormularioUsuario" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="painelTela" id="telaLista" aria-labelledby="tituloLista" hidden>
+      <div class="cabecalhoTela">
+        <div>
+          <p class="textoDestaque">Tela 2</p>
+          <h2 id="tituloLista">Lista de usuários</h2>
+          <p>Edite, exclua ou apague os dados salvos no LocalStorage.</p>
+        </div>
+
+        <button class="botaoPerigo" id="botaoLimparUsuarios" type="button">Apagar todos</button>
+      </div>
+
+      <div class="gradeResumo" aria-label="Resumo dos usuários cadastrados">
+        <article class="itemResumo">
+          <strong id="valorTotalUsuarios">0</strong>
+          <span>Speedrunners</span>
+        </article>
+        <article class="itemResumo">
+          <strong id="valorUsuariosMaiores">0</strong>
+          <span>Maiores de idade</span>
+        </article>
+        <article class="itemResumo">
+          <strong id="valorUsuarioMaisJovem">--</strong>
+          <span>Mais jovem</span>
+        </article>
+      </div>
+
+      <label class="campoBusca" for="campoBuscaUsuario">
+        Buscar por nome, e-mail ou CPF
+        <input id="campoBuscaUsuario" type="search" placeholder="Digite para filtrar">
+      </label>
+
+      <div class="areaTabela">
+        <table class="tabelaUsuario">
+          <caption>Usuários cadastrados no projeto Speedrunners</caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Nome</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">CPF</th>
+              <th scope="col">Idade</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="corpoTabelaUsuarios"></tbody>
+        </table>
+      </div>
+
+      <p class="mensagemVazia" id="mensagemUsuariosVazia" hidden>Nenhum speedrunner encontrado.</p>
+    </section>
+
+    <section class="painelTela" id="telaCep" aria-labelledby="tituloCep" hidden>
+      <div class="cabecalhoTela">
+        <div>
+          <p class="textoDestaque">Tela 3</p>
+          <h2 id="tituloCep">Consulta de CEP</h2>
+          <p>Busque o endereço do ponto de encontro da corrida usando Fetch API.</p>
+        </div>
+
+        <div class="iconeMedio" aria-hidden="true">CEP</div>
+      </div>
+
+      <form class="formularioCep" id="formularioCep" novalidate>
+        <label class="campoFormulario campoCep" for="campoCep">
+          CEP
+          <input id="campoCep" name="cep" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9" required>
+          <span class="mensagemErroCampo" id="erroCep" aria-live="polite"></span>
+        </label>
+
+        <button class="botaoPrimario" type="submit">Consultar CEP</button>
+      </form>
+
+      <div class="gradeEndereco" aria-label="Endereço retornado pela API">
+        <label class="campoFormulario" for="campoRua">
+          Rua
+          <input id="campoRua" type="text" readonly>
+        </label>
+        <label class="campoFormulario" for="campoBairro">
+          Bairro
+          <input id="campoBairro" type="text" readonly>
+        </label>
+        <label class="campoFormulario" for="campoCidade">
+          Cidade
+          <input id="campoCidade" type="text" readonly>
+        </label>
+        <label class="campoFormulario" for="campoEstado">
+          Estado
+          <input id="campoEstado" type="text" readonly>
+        </label>
+      </div>
+
+      <p class="retornoFormulario" id="retornoCep" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="painelTela" id="telaSobre" aria-labelledby="tituloSobre" hidden>
+      <div class="introducaoTela introducaoSobre">
+        <div>
+          <p class="textoDestaque">Tela 4</p>
+          <h2 id="tituloSobre">Sobre o projeto</h2>
+          <p>
+            Esta aplicação usa o universo de speedruns para organizar uma
+            comunidade de jogadores que buscam concluir jogos, fases ou desafios
+            no menor tempo possível.
+          </p>
+        </div>
+
+        <img
+          class="imagemDestaque"
+          src="Img/Davy_Jones.jpg"
+          alt="Davy Jones representando a comunidade de speedrunners"
+          width="320"
+          height="240"
+        >
+      </div>
+
+      <div class="gradeConceitos">
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">SR</span>
+          <h3>Base temática: speedrun</h3>
+          <p>
+            Speedrun é uma modalidade dos games em que o objetivo é terminar um jogo
+            inteiro, uma fase ou uma categoria específica no menor tempo possível.
+            O projeto usa essa ideia para simular uma pequena comunidade de
+            competidores, chamados speedrunners, que precisam ser cadastrados e
+            consultados pela organização.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">CT</span>
+          <h3>Categorias, técnicas e validação</h3>
+          <p>
+            No speedrun, cada tentativa costuma ser chamada de run e pode seguir
+            regras próprias, como categorias que permitem ou proíbem glitches.
+            A comunidade também valoriza provas, transmissões e temporizadores para
+            confirmar os tempos. Por isso, a aplicação foi pensada como um painel
+            de controle com dados confiáveis, lista organizada e consulta externa.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">HT</span>
+          <h3>HTML semântico</h3>
+          <p>
+            A estrutura usa tags com significado: header para o cabeçalho, nav para
+            o painel de navegação, main para o conteúdo principal, section para cada
+            tela, form para entradas de dados, table para a lista, caption para
+            descrever a tabela e article para blocos independentes de informação.
+            Isso melhora leitura do código, acessibilidade e compreensão pelo
+            navegador.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">BX</span>
+          <h3>CSS, Box Model e hierarquia visual</h3>
+          <p>
+            O CSS controla margem, preenchimento, borda, largura e altura dos
+            elementos, que são partes do Box Model. As telas usam cartões, botões,
+            campos e tabelas com espaçamento consistente para separar grupos de
+            conteúdo. A hierarquia visual aparece nos títulos maiores, textos de
+            apoio menores, cores de destaque e mensagens de erro ou sucesso.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">FG</span>
+          <h3>Flexbox, Grid e responsividade</h3>
+          <p>
+            Flexbox foi usado no cabeçalho, nos botões de ação e nos formulários
+            que precisam alinhar itens lado a lado. Grid foi usado nas grades de
+            campos, resumo, endereço e conceitos, porque facilita organizar colunas
+            iguais. As Media Queries mudam essas colunas para uma coluna única em
+            telas menores, mantendo o layout fluido em celulares e computadores.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">JS</span>
+          <h3>JavaScript e eventos</h3>
+          <p>
+            O JavaScript controla as interações: cliques nos botões de navegação,
+            envio do formulário, digitação nos campos, saída do campo de CEP e
+            ações de editar ou excluir. As funções em português deixam claro o
+            comportamento esperado, como mostrarTela, validarFormularioUsuario,
+            salvarUsuario, consultarCep e alternarTema.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">VF</span>
+          <h3>Validação em tempo real</h3>
+          <p>
+            Nome, e-mail, CPF e idade são validados enquanto o usuário digita.
+            O CPF recebe máscara, passa por cálculo dos dígitos verificadores e
+            também é comparado com os CPFs já salvos para evitar cadastro repetido.
+            O atributo aria-invalid e as mensagens em aria-live ajudam a comunicar
+            erros de forma acessível.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">LS</span>
+          <h3>LocalStorage</h3>
+          <p>
+            O LocalStorage guarda dados diretamente no navegador. A lista de
+            usuários é convertida para texto com JSON.stringify antes de salvar e
+            volta a ser array com JSON.parse ao carregar a página. Assim, os
+            registros continuam disponíveis depois de atualizar ou fechar o site.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">API</span>
+          <h3>Fetch API e ViaCEP</h3>
+          <p>
+            A tela de CEP usa fetch para consultar a API pública ViaCEP. Quando o
+            CEP tem oito números, o JavaScript envia a requisição, espera a resposta
+            em JSON e preenche rua, bairro, cidade e estado. Se a API retornar erro
+            ou o CEP não existir, a aplicação limpa os campos e mostra uma mensagem.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">TE</span>
+          <h3>Tema claro e escuro</h3>
+          <p>
+            O botão de tema altera um atributo no elemento html. O CSS lê esse
+            atributo e troca variáveis de cor, como fundo, texto, borda e destaque.
+            A escolha também é salva no LocalStorage para que o tema preferido seja
+            restaurado quando a página for aberta novamente.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">AC</span>
+          <h3>Acessibilidade, imagens locais e ícones</h3>
+          <p>
+            A interface usa botões reais, labels ligados aos campos, mensagens com
+            role status e aria-live, foco visível e textos claros. As imagens
+            principais foram trocadas por arquivos locais da pasta Img, evitando
+            dependência de serviços externos. Os botões e cards receberam ícones
+            por CSS, usando pseudo-elementos para reforçar a função de cada ação.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">UI</span>
+          <h3>Estilização final e temas visuais</h3>
+          <p>
+            A camada final de CSS adicionou transições, sombras suaves, estados de
+            hover, foco acessível e ícones nos controles principais. O tema claro
+            usa uma leitura inspirada no Google, com fonte Inter, superfície branca,
+            azul de ação e apoio em vermelho, amarelo e verde. O tema escuro usa
+            uma leitura inspirada na Apple, com pilhas de fonte SF Pro, fundo preto,
+            painéis translúcidos, bordas mais claras e azul de destaque. Também
+            foram adicionados ajustes responsivos para tablets e celulares da Apple,
+            incluindo larguras próximas de iPad, iPhone, áreas seguras do sistema e
+            botões maiores para toque.
+          </p>
+        </article>
+
+        <article class="itemConceito">
+          <span class="iconeConceito" aria-hidden="true">RF</span>
+          <h3>Referência usada</h3>
+          <p>
+            A explicação temática foi baseada no artigo
+            <a href="https://tecnoblog.net/responde/o-que-e-speedrun/" target="_blank" rel="noreferrer">O que é speedrun?, do Tecnoblog</a>,
+            que apresenta a modalidade, a ideia de terminar jogos rapidamente,
+            o papel da comunidade, das transmissões e dos temporizadores.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
